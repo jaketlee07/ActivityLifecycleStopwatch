@@ -13,6 +13,7 @@ public class MainActivity extends AppCompatActivity
 {
     private int seconds =0;
     private boolean running = false;
+    private boolean wasRunning = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -20,8 +21,54 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        if (savedInstanceState != null)
+        {
+            seconds = savedInstanceState.getInt("seconds");
+            running = savedInstanceState.getBoolean("running");
+            wasRunning = savedInstanceState.getBoolean("wasRunning");
+        }
+
         runTimer();
     }
+        @Override
+        public void onSaveInstanceState(Bundle savedInstanceState)
+        {
+            super.onSaveInstanceState(savedInstanceState);
+            savedInstanceState.putInt("seconds", seconds);
+            savedInstanceState.putBoolean("running", running);
+            savedInstanceState.putBoolean("wasRunning", wasRunning);
+    }
+
+         @Override
+        protected void onStop()
+         {
+            super.onStop();
+            wasRunning = running;
+            running = false;
+        }
+        @Override
+        protected void onStart()
+        {
+            super.onStart();
+            running = wasRunning;
+        }
+        // if the activity is paused, then pause the stopwatch
+        @Override
+        protected void onPause()
+        {
+            super.onPause();
+            wasRunning = running;
+            running = false;
+        }
+        // if the activity is resumed, start the stopwatch if it was running previously
+        @Override
+        protected void onResume()
+        {
+            super.onResume();
+            if (wasRunning)
+            running = true;
+    }
+
     // Start stopwatch when the Start button is clicked.
     public void onClickStart(View v)
     {
